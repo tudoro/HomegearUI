@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E5E37578-848F-4CA7-9185-8D9AA23400DC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D863E0A7-3430-4FFA-910D-00ADD1E95500}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HomegearUI", "src\HomegearUI\HomegearUI.xproj", "{23D5D91E-52C9-4930-AD23-0C5D5455990D}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HomegearXMLRPCService", "src\HomegearXMLRPCService\HomegearXMLRPCService.xproj", "{848A9CFD-2657-4610-B92F-D2661E909E1B}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Abstractions", "src\Abstractions\Abstractions.xproj", "{4DBA0642-8FE8-4F20-9DF4-1DB210E1CDB9}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Infrastructure", "src\Infrastructure\Infrastructure.xproj", "{9667ACB2-2FBC-4993-B916-3898D5079A28}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23D5D91E-52C9-4930-AD23-0C5D5455990D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23D5D91E-52C9-4930-AD23-0C5D5455990D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23D5D91E-52C9-4930-AD23-0C5D5455990D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23D5D91E-52C9-4930-AD23-0C5D5455990D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{848A9CFD-2657-4610-B92F-D2661E909E1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{848A9CFD-2657-4610-B92F-D2661E909E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{848A9CFD-2657-4610-B92F-D2661E909E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{848A9CFD-2657-4610-B92F-D2661E909E1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DBA0642-8FE8-4F20-9DF4-1DB210E1CDB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DBA0642-8FE8-4F20-9DF4-1DB210E1CDB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DBA0642-8FE8-4F20-9DF4-1DB210E1CDB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DBA0642-8FE8-4F20-9DF4-1DB210E1CDB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9667ACB2-2FBC-4993-B916-3898D5079A28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9667ACB2-2FBC-4993-B916-3898D5079A28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9667ACB2-2FBC-4993-B916-3898D5079A28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9667ACB2-2FBC-4993-B916-3898D5079A28}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{23D5D91E-52C9-4930-AD23-0C5D5455990D} = {E5E37578-848F-4CA7-9185-8D9AA23400DC}
+		{848A9CFD-2657-4610-B92F-D2661E909E1B} = {E5E37578-848F-4CA7-9185-8D9AA23400DC}
+		{4DBA0642-8FE8-4F20-9DF4-1DB210E1CDB9} = {E5E37578-848F-4CA7-9185-8D9AA23400DC}
+		{9667ACB2-2FBC-4993-B916-3898D5079A28} = {E5E37578-848F-4CA7-9185-8D9AA23400DC}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,22 @@
+{
+    "title": "Homegear XMLRPC Service",
+    "copyright": "2016",
+    "description": "Windows XMLRPC.NET service for Homegear",
+    "language": "en",
+    "version": "1.0.0-*",
+    "frameworks": {
+        "net461": {
+            "dependencies": {
+                "xmlrpcnet": "2.5.0",
+                "Abstractions": {
+                    "target": "project"
+                }
+            }
+        }
+    },
+    "dependencies": {
+        "HomegearLib": "1.0.0",
+        "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
+        "Microsoft.Extensions.Options": "1.0.0"
+    }
+}
