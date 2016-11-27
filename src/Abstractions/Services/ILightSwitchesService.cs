@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Abstractions.Models;
 
 namespace Abstractions.Services
 {
-    public interface ILightSwitchService
-    {
-        
+    public interface ILightSwitchesService
+    {        
         IEnumerable<LightSwitchModel> GetAll();
-
         /// <summary>
         /// Returns the light switch which matches the peerId
         /// </summary>
-        /// <param name="peerId">The Id of the light switch</param>
+        /// <param name="id">The Id of the light switch</param>
         /// <returns>The light switch for the given peerId</returns>
-        LightSwitchModel GetByPeerId(int peerId);
-        void SetStateForPeerId(int id, bool state);
+        LightSwitchModel GetById(int id);
+        void SetStateForId(int id, bool state);
     }
 }

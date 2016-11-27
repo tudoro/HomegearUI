@@ -5,38 +5,36 @@ using Abstractions.Services;
 using HomegearLib.RPC;
 using HomegearLib;
 using System.Security.Authentication;
-using HomegearXMLRPCService.Options;
-using Microsoft.Extensions.Options;
-
 
 namespace HomegearXMLRPCService.Services
 {
-    public class XMLRPCHomegearService : IHomegearService
+    /// <summary>
+    /// Connects the middleware to the Homegear Server via the RPC library HomegearLib
+    /// It creates a callback server so that Homegear Server can send events to the middleware
+    /// about actions that the middleware needs to take.
+    /// </summary>
+    public class XMLRPCHomegearConnectionService : IHomegearConnectionService
     {
-
         private Homegear homegear;
         private RPCController homegearController;
 
-        public XMLRPCHomegearService(IOptions<Connection> configConnection)
+        public XMLRPCHomegearConnectionService(Homegear homegear, RPCController rpcController)
         {
-            Connection connectionSettings = configConnection.Value;
-            homegearController = new RPCController(
-                connectionSettings.IP,
-                connectionSettings.Port,
-                connectionSettings.EventListenerHostname,
-                connectionSettings.EventListenerIP,
-                connectionSettings.EventListenerPort);
+            this.homegearController = rpcController;
+            this.homegearController.ServerConnected += rpc_serverConnected;
+            this.homegear = homegear;
 
-            homegearController.ServerConnected += rpc_serverConnected;
-
-            homegear = new Homegear(homegearController, true);
-            homegear.Reloaded += homegear_OnReloaded;
-            homegear.ConnectError += homegear_OnConnectError;
-            homegear.ReloadRequired += homegear_OnReloadRequired;
-            homegear.DeviceReloadRequired += homegear_OnDeviceReloadRequired;
-            homegear.DeviceVariableUpdated += homegear_OnDeviceVariableUpdated;
+            //this.homegear.Reloaded += homegear_OnReloaded;
+            //this.homegear.ConnectError += homegear_OnConnectError;
+            this.homegear.ReloadRequired += homegear_OnReloadRequired;
+            this.homegear.DeviceReloadRequired += homegear_OnDeviceReloadRequired;
+            this.homegear.DeviceVariableUpdated += homegear_OnDeviceVariableUpdated;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public HomegearStatusModel GetStatus()
         {
             return new HomegearStatusModel
@@ -130,64 +128,17 @@ namespace HomegearXMLRPCService.Services
         }
 
 
-        void homegear_OnConnectError(Homegear sender, string message, string stackTrace)
-        {
-            Console.Write("Error connecting to Homegear: " + message + "\r\nStacktrace: " + stackTrace);
-        }
+        //void homegear_OnConnectError(Homegear sender, string message, string stackTrace)
+        //{
+        //    Console.Write("Error connecting to Homegear: " + message + "\r\nStacktrace: " + stackTrace);
+        //}
 
-        void homegear_OnReloaded(Homegear sender)
-        {
-            Console.Write("Reload complete. Received " + sender.Devices.Count + " devices.");
+        //void homegear_OnReloaded(Homegear sender)
+        //{
+        //    Console.Write("Reload complete. Received " + sender.Devices.Count + " devices.");
 
 
-            //Now we can start working with the Homegear object
-        }
-
-        public IEnumerable<LightSwitchModel> GetAll()
-        {
-            List<LightSwitchModel> lightSwitches = new List<LightSwitchModel>();
-            foreach (KeyValuePair<int, Device> device in homegear.Devices)
-            {
-                lightSwitches.Add(new LightSwitchModel
-                {
-                    Id = device.Key,
-                    State = true
-                });
-            }
-
-            return lightSwitches;
-
-            //List<LightSwitchModel> lightSwitches = new List<LightSwitchModel>();
-            //IEnumerable<int> connectedDevicesIds = homematic.getPeerId(3, "105");
-            //foreach(int id in connectedDevicesIds)
-            //{
-            //    bool currentState = homematic.getValue(id, 1, "STATE");
-            //    lightSwitches.Add(new LightSwitchModel
-            //    {
-            //        Id = id,
-            //        State = currentState
-            //    });
-
-            //}
-            //return lightSwitches;
-        }
-
-        public LightSwitchModel GetByPeerId(int peerId)
-        {
-            //bool currentState = homematic.getValue(peerId, 1, "STATE");
-
-            bool currentState = homegear.Devices[peerId].Channels[1].Variables["STATE"].BooleanValue;
-            return new LightSwitchModel
-            {
-                Id = peerId,
-                State = currentState
-            };
-        }
-
-        public void SetStateForPeerId(int peerId, bool state)
-        {
-            homegear.Devices[peerId].Channels[1].Variables["STATE"].BooleanValue = state;
-            //homematic.setValue(peerId, 1, "STATE", state);
-        }
+        //    //Now we can start working with the Homegear object
+        //}
     }
 }

@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Abstractions.Services;
 using HomegearXMLRPCService.Services;
-using HomegearXMLRPCService.Options;
 using Microsoft.Extensions.Configuration;
+using HomegearXMLRPCService.Extensions;
 
 namespace HomegearUI
 {
@@ -43,18 +43,18 @@ namespace HomegearUI
             services.AddMvc();
 
             services.AddOptions();
-            services.Configure<Connection>(configuration.GetSection("Homegear:Connection"));
-
             services.AddRouting();
-
             // here we could add specific policies that can be selected at run time.
             services.AddCors();
 
-            services.AddSingleton<IHomegearService, XMLRPCHomegearService>();
+            services.AddXMLRPCHomegear(configuration.GetSection("Homegear:Connection"));
+            services.AddSingleton<IHomegearConnectionService, XMLRPCHomegearConnectionService>();
+            services.AddSingleton<IDevicesService, XMLRPCDevicesService>();
+            services.AddSingleton<ILightSwitchesService, XMLRPCLightSwitchesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IHomegearService homegear)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IHomegearConnectionService homegear)
         {
             loggerFactory.AddConsole();
 

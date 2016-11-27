@@ -9,8 +9,8 @@ namespace HomegearUI.Controllers.Api
     [Route("api/[controller]")]
     public class StatusController : Controller
     {
-        private IHomegearService homegearService;
-        public StatusController(IHomegearService homegearService)
+        private IHomegearConnectionService homegearService;
+        public StatusController(IHomegearConnectionService homegearService)
         {
             this.homegearService = homegearService;
         }
