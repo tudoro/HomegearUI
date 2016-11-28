@@ -35,7 +35,7 @@ namespace HomegearUI.Controllers.Api
             }
             catch (KeyNotFoundException e)
             {
-                return new NotFoundResult();
+                return NotFound();
             }            
         }
 
@@ -45,11 +45,11 @@ namespace HomegearUI.Controllers.Api
             try
             {
                 lightSwitchesService.SetStateForId(id, lightSwitch.State);
-                return new NoContentResult();
+                return NoContent();
             }
             catch (KeyNotFoundException e)
             {
-                return new BadRequestResult();
+                return BadRequest();
             }
         }
     }
