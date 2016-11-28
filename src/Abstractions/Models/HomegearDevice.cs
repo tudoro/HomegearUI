@@ -23,7 +23,7 @@ namespace Abstractions.Models
                 string entryPoint;
                 if (deviceTypeEntryPoints.TryGetValue(this.TypeID, out entryPoint))
                 {
-                    return entryPoint + "/" + Id;
+                    return $"{entryPoint}/{Id}";
                 }
                 return "";
             }
