@@ -11,7 +11,7 @@ namespace Abstractions.Models
     {
         private readonly IDictionary<int, string> deviceTypeEntryPoints = new Dictionary<int, string>
         {
-            { 105, "lightswitches" }
+            { (int)HomegearDeviceTypes.LightSwitch, "lightswitches" }
         };
 
         public int Id { get; set; }
@@ -21,8 +21,11 @@ namespace Abstractions.Models
             get 
             {
                 string entryPoint;
-                deviceTypeEntryPoints.TryGetValue(this.TypeID, out entryPoint);
-                return entryPoint + "/" + Id;
+                if (deviceTypeEntryPoints.TryGetValue(this.TypeID, out entryPoint))
+                {
+                    return entryPoint + "/" + Id;
+                }
+                return "";
             }
         }
         public string SerialNumber { get; set; }
