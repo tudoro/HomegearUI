@@ -6,8 +6,15 @@ using System;
 
 namespace HomegearXMLRPCService.Services
 {
+    /// <summary>
+    /// Used to manage the general information about the devices registered in the Homegear system.
+    /// </summary>
     public class XMLRPCDevicesService : IDevicesService
     {
+        /// <summary>
+        /// Reference to the <see cref="Homegear"/> service that is used to provide
+        /// data about each device in the system and manipulate it.
+        /// </summary>
         private Homegear homegear;
 
         public XMLRPCDevicesService(Homegear homegear)
@@ -15,15 +22,19 @@ namespace HomegearXMLRPCService.Services
             this.homegear = homegear;
         }
 
-        public IEnumerable<HomegearDevice> GetAll()
+        /// <summary>
+        /// Fetches all the devices registered in the system
+        /// </summary>
+        /// <returns>All the devices</returns>
+        public IEnumerable<HomegearDeviceModel> GetAll()
         {
-            List<HomegearDevice> homegearDevices = new List<HomegearDevice>();
+            List<HomegearDeviceModel> homegearDevices = new List<HomegearDeviceModel>();
             foreach (KeyValuePair<int, Device> device in homegear.Devices)
             {
-                homegearDevices.Add(new HomegearDevice
+                homegearDevices.Add(new HomegearDeviceModel
                 {
                     Id = device.Key,
-                    TypeID = device.Value.TypeID,
+                    TypeID = (HomegearDeviceTypes)device.Value.TypeID,
                     TypeString = device.Value.TypeString,
                     Name = device.Value.Name,
                     SerialNumber = device.Value.SerialNumber
@@ -32,5 +43,23 @@ namespace HomegearXMLRPCService.Services
             return homegearDevices;
         }
 
+        /// <summary>
+        /// Updates information about a device
+        /// </summary>
+        /// <param name="deviceModel">The device information to update</param>
+        /// <returns>The updated device</returns>
+        public HomegearDeviceModel UpdateDevice(HomegearDeviceModel deviceModel)
+        {
+            Device foundDevice;
+            if (homegear.Devices.TryGetValue(deviceModel.Id, out foundDevice))
+            {
+                foundDevice.Name = deviceModel.Name;
+                return deviceModel;
+            }
+            else
+            {
+                throw new KeyNotFoundException();
+            }
+        }
     }
 }

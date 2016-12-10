@@ -6,6 +6,9 @@ using Abstractions.Services;
 
 namespace HomegearUI.Controllers.Api
 {
+    /// <summary>
+    /// Manages the status of the connection to the Homegear server
+    /// </summary>
     [Route("api/[controller]")]
     public class StatusController : Controller
     {
@@ -14,7 +17,11 @@ namespace HomegearUI.Controllers.Api
         {
             this.homegearService = homegearService;
         }
-
+        
+        /// <summary>
+        /// Gets the current status of the connection to the Homegear server
+        /// </summary>
+        /// <returns>True if it is connected, False otherwise</returns>
         // GET: api/values
         [HttpGet]
         public HomegearStatusModel Get()

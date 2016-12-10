@@ -5,8 +5,14 @@ using HomegearLib;
 
 namespace HomegearXMLRPCService.Services
 {
+    /// <summary>
+    /// Manages the lightswitches
+    /// </summary>
     public class XMLRPCLightSwitchesService : ILightSwitchesService
     {
+        /// <summary>
+        /// Reference to the <see cref="Homegear"/> service
+        /// </summary>
         private readonly Homegear homegear;
 
         public XMLRPCLightSwitchesService(Homegear homegear)
@@ -14,6 +20,10 @@ namespace HomegearXMLRPCService.Services
             this.homegear = homegear;
         }
 
+        /// <summary>
+        /// Gets all the lightswitch devices of type <see cref="HomegearDeviceTypes.LightSwitch"/> 
+        /// </summary>
+        /// <returns>All the lightswitches</returns>
         public IEnumerable<LightSwitchModel> GetAll()
         {
             List<LightSwitchModel> lightSwitches = new List<LightSwitchModel>();
@@ -32,7 +42,7 @@ namespace HomegearXMLRPCService.Services
         }
 
         /// <summary>
-        /// Returns the light switch which matches the peerId
+        /// Returns the light switch which matches the id
         /// </summary>
         /// <param name="id">The Id of the light switch</param>
         /// <returns>The light switch for the given peerId</returns>
@@ -41,6 +51,10 @@ namespace HomegearXMLRPCService.Services
             try
             {
                 Device device = GetDeviceForId(id);
+                if (device.TypeID != (int)HomegearDeviceTypes.LightSwitch)
+                {
+                    throw new KeyNotFoundException();
+                }
                 return new LightSwitchModel
                 {
                     Id = id,
@@ -53,11 +67,20 @@ namespace HomegearXMLRPCService.Services
             }
         }
 
+        /// <summary>
+        /// Turns a lightswitch on or off
+        /// </summary>
+        /// <param name="id">The id of the device</param>
+        /// <param name="state">True for turning on, False otherwise</param>
         public void SetStateForId(int id, bool state)
         {
             try
             {
                 Device device = GetDeviceForId(id);
+                if (device.TypeID == (int)HomegearDeviceTypes.LightSwitch)
+                {
+                    throw new KeyNotFoundException();
+                }
                 device.Channels[1].Variables["STATE"].BooleanValue = state;
             }
             catch (KeyNotFoundException e)
@@ -67,6 +90,11 @@ namespace HomegearXMLRPCService.Services
             
         }
 
+        /// <summary>
+        /// Helper to get a certain device from the collection of devices returned by the <see cref="Homegear"/> service 
+        /// </summary>
+        /// <param name="id">The id of the lightswitch to search in the collection</param>
+        /// <returns>The device</returns>
         private Device GetDeviceForId(int id)
         {
             Device device;

@@ -7,46 +7,59 @@ using Abstractions.Models;
 
 namespace HomegearUI.Controllers.Api
 {
-
+    /// <summary>
+    /// Manages the requests for the devices in the system
+    /// </summary>
     [Route("api/[controller]")]
     public class DevicesController : Controller
     {
+        /// <summary>
+        /// Reference to the service that communicates with Homegear
+        /// </summary>
         private IDevicesService devicesService;
+
         public DevicesController(IDevicesService devicesService)
         {
             this.devicesService = devicesService;
         }
-
+        
+        /// <summary>
+        /// Gets all the devices
+        /// </summary>
+        /// <returns>The devices</returns>
         // GET: api/values
         [HttpGet]
-        public IEnumerable<HomegearDevice> Get()
+        public IEnumerable<HomegearDeviceModel> Get()
         {
             return devicesService.GetAll();
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
+        /// <summary>
+        /// Updates a device
+        /// </summary>
+        /// <param name="id">The id of the device</param>
+        /// <param name="homegearDevice">The device data to be updated</param>
+        /// <returns>The updated device</returns>
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public IActionResult Update(int id, [FromBody] HomegearDeviceModel homegearDevice)
         {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    homegearDevice.Id = id;
+                    return Ok(devicesService.UpdateDevice(homegearDevice));
+                }
+                catch (KeyNotFoundException e)
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }
