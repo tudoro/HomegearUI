@@ -63,7 +63,7 @@ namespace HomegearXMLRPCService.Services
             }
             catch(KeyNotFoundException e)
             {
-                throw;
+                throw e;
             }
         }
 
@@ -85,7 +85,7 @@ namespace HomegearXMLRPCService.Services
             }
             catch (KeyNotFoundException e)
             {
-                throw;
+                throw e;
             }
             
         }

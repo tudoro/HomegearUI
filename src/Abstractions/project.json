@@ -1,7 +1,7 @@
 {
   "version": "1.0.0-*",
     "dependencies": {
-        "System.ComponentModel.Annotations": "4.1.0"
+        "System.ComponentModel.Annotations": "4.3.0"
     },
     "frameworks": {
         "net461": {}
