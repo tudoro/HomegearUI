@@ -18,17 +18,19 @@
     },
 
     "frameworks": {
-        //"netcoreapp1.0": {
+        //"netcoreapp1.1": {
         //    "dependencies": {
-        //        "Microsoft.NETCore.App": {
-        //            "version": "1.0.0",
-        //            "type": "platform"
+        //        "DB": {
+        //            "target": "project"
         //        }
         //    }
         //},
         "net461": {
             "dependencies": {
                 "HomegearXMLRPCService": {
+                    "target": "project"
+                },
+                "DB": {
                     "target": "project"
                 },
                 "Abstractions": {
