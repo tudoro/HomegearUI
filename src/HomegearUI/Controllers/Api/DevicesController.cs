@@ -16,11 +16,11 @@ namespace HomegearUI.Controllers.Api
         /// <summary>
         /// Reference to the service that communicates with Homegear
         /// </summary>
-        private IDevicesService devicesService;
+        private IDevicesService _devicesService;
 
         public DevicesController(IDevicesService devicesService)
         {
-            this.devicesService = devicesService;
+            this._devicesService = devicesService;
         }
         
         /// <summary>
@@ -31,7 +31,7 @@ namespace HomegearUI.Controllers.Api
         [HttpGet]
         public IEnumerable<HomegearDeviceModel> Get()
         {
-            return devicesService.GetAll();
+            return _devicesService.GetAll();
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace HomegearUI.Controllers.Api
                 try
                 {
                     homegearDevice.Id = id;
-                    return Ok(devicesService.UpdateDevice(homegearDevice));
+                    return Ok(_devicesService.UpdateDevice(homegearDevice));
                 }
                 catch (KeyNotFoundException e)
                 {

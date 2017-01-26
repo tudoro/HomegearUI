@@ -13,11 +13,11 @@ namespace HomegearXMLRPCService.Services
         /// <summary>
         /// Reference to the <see cref="Homegear"/> service
         /// </summary>
-        private readonly Homegear homegear;
+        private readonly Homegear _homegear;
 
         public XMLRPCLightSwitchesService(Homegear homegear)
         {
-            this.homegear = homegear;
+            this._homegear = homegear;
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace HomegearXMLRPCService.Services
         public IEnumerable<LightSwitchModel> GetAll()
         {
             List<LightSwitchModel> lightSwitches = new List<LightSwitchModel>();
-            foreach (KeyValuePair<int, Device> device in homegear.Devices)
+            foreach (KeyValuePair<int, Device> device in _homegear.Devices)
             {
                 if (device.Value.TypeID == (int)HomegearDeviceTypes.LightSwitch)
                 {
@@ -77,7 +77,7 @@ namespace HomegearXMLRPCService.Services
             try
             {
                 Device device = GetDeviceForId(id);
-                if (device.TypeID == (int)HomegearDeviceTypes.LightSwitch)
+                if (device.TypeID != (int)HomegearDeviceTypes.LightSwitch)
                 {
                     throw new KeyNotFoundException();
                 }
@@ -98,7 +98,7 @@ namespace HomegearXMLRPCService.Services
         private Device GetDeviceForId(int id)
         {
             Device device;
-            if (homegear.Devices.TryGetValue(id, out device))
+            if (_homegear.Devices.TryGetValue(id, out device))
             {
                 return device;
             }

@@ -15,11 +15,11 @@ namespace HomegearXMLRPCService.Services
         /// Reference to the <see cref="Homegear"/> service that is used to provide
         /// data about each device in the system and manipulate it.
         /// </summary>
-        private Homegear homegear;
+        private Homegear _homegear;
 
         public XMLRPCDevicesService(Homegear homegear)
         {
-            this.homegear = homegear;
+            this._homegear = homegear;
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace HomegearXMLRPCService.Services
         public IEnumerable<HomegearDeviceModel> GetAll()
         {
             List<HomegearDeviceModel> homegearDevices = new List<HomegearDeviceModel>();
-            foreach (KeyValuePair<int, Device> device in homegear.Devices)
+            foreach (KeyValuePair<int, Device> device in _homegear.Devices)
             {
                 homegearDevices.Add(new HomegearDeviceModel
                 {
@@ -51,7 +51,7 @@ namespace HomegearXMLRPCService.Services
         public HomegearDeviceModel UpdateDevice(HomegearDeviceModel deviceModel)
         {
             Device foundDevice;
-            if (homegear.Devices.TryGetValue(deviceModel.Id, out foundDevice))
+            if (_homegear.Devices.TryGetValue(deviceModel.Id, out foundDevice))
             {
                 foundDevice.Name = deviceModel.Name;
                 return deviceModel;

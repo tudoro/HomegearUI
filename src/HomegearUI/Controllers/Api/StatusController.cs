@@ -12,10 +12,10 @@ namespace HomegearUI.Controllers.Api
     [Route("api/[controller]")]
     public class StatusController : Controller
     {
-        private IHomegearConnectionService homegearService;
+        private IHomegearConnectionService _homegearService;
         public StatusController(IHomegearConnectionService homegearService)
         {
-            this.homegearService = homegearService;
+            this._homegearService = homegearService;
         }
         
         /// <summary>
@@ -26,7 +26,7 @@ namespace HomegearUI.Controllers.Api
         [HttpGet]
         public HomegearStatusModel Get()
         {
-            return homegearService.GetStatus();
+            return _homegearService.GetStatus();
         }
     }
 }

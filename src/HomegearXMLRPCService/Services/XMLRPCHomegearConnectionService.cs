@@ -5,6 +5,8 @@ using Abstractions.Services;
 using HomegearLib.RPC;
 using HomegearLib;
 using System.Security.Authentication;
+using HomegearXMLRPCService.CallbackHandlers;
+using HomegearXMLRPCService.CallbackHandlers.Loggers;
 
 namespace HomegearXMLRPCService.Services
 {
@@ -15,20 +17,31 @@ namespace HomegearXMLRPCService.Services
     /// </summary>
     public class XMLRPCHomegearConnectionService : IHomegearConnectionService
     {
-        private Homegear homegear;
-        private RPCController homegearController;
+        private Homegear _homegear;
+        private RPCController _homegearController;
+        private ILightSwitchesPersistenceService _lightSwitchesPersistence;
 
-        public XMLRPCHomegearConnectionService(Homegear homegear, RPCController rpcController)
+        private EventLoggerFactory _eventLoggerFactory;
+        private XMLRPCCallbackHandler _xmlRPCCallbackHandler;
+
+        public XMLRPCHomegearConnectionService(Homegear homegear, RPCController rpcController, ILightSwitchesPersistenceService lightSwitchesPersistence)
         {
-            this.homegearController = rpcController;
-            this.homegearController.ServerConnected += rpc_serverConnected;
-            this.homegear = homegear;
+            _homegearController = rpcController;
+            _homegear = homegear;
+            _lightSwitchesPersistence = lightSwitchesPersistence;
+
+            _homegearController.ServerConnected += rpc_serverConnected;
 
             //this.homegear.Reloaded += homegear_OnReloaded;
             //this.homegear.ConnectError += homegear_OnConnectError;
-            this.homegear.ReloadRequired += homegear_OnReloadRequired;
-            this.homegear.DeviceReloadRequired += homegear_OnDeviceReloadRequired;
-            this.homegear.DeviceVariableUpdated += homegear_OnDeviceVariableUpdated;
+            _homegear.ReloadRequired += homegear_OnReloadRequired;
+            _homegear.DeviceReloadRequired += homegear_OnDeviceReloadRequired;
+            _homegear.DeviceVariableUpdated += homegear_OnDeviceVariableUpdated;
+
+            _xmlRPCCallbackHandler = new XMLRPCCallbackHandler();
+            _eventLoggerFactory = new EventLoggerFactory();
+            _eventLoggerFactory.RegisterEventLogger("STATE", new LightSwitchEventLogger(lightSwitchesPersistence));
+
         }
 
         /// <summary>
@@ -39,20 +52,27 @@ namespace HomegearXMLRPCService.Services
         {
             return new HomegearStatusModel
             {
-                IsConnected = homegearController.IsConnected
+                IsConnected = _homegearController.IsConnected
             };
         }
 
         void rpc_serverConnected(RPCServer sender, CipherAlgorithmType cipherAlgorithm, Int32 cipherStrength)
         {
-            ReadOnlyDictionary<int, UpdateResult> update = homegear.GetUpdateStatus().Results;
+            ReadOnlyDictionary<int, UpdateResult> update = _homegear.GetUpdateStatus().Results;
             if (cipherAlgorithm != CipherAlgorithmType.Null) Console.Write("Incoming connection from Homegear. Cipher Algorithm: " + cipherAlgorithm.ToString() + ", Cipher Strength: " + cipherStrength.ToString());
             else Console.Write("Incoming connection from Homegear.");
         }
 
         void homegear_OnDeviceVariableUpdated(Homegear sender, Device device, Channel channel, Variable variable)
         {
-            Console.Write("Variable updated: Device type: \"" + device.TypeString + "\", ID: " + device.ID.ToString() + ", Channel: " + channel.Index.ToString() + ", Variable Name: \"" + variable.Name + "\", Value: " + variable.ToString());
+            try
+            {
+                var eventLogger = _eventLoggerFactory.GetEventLoggerFor(variable.Name);
+                _xmlRPCCallbackHandler.EventLogger = eventLogger;
+                _xmlRPCCallbackHandler.LogEvent(device, variable);
+            }
+            catch (KeyNotFoundException exception)
+            {}
         }
 
         void homegear_OnDeviceReloadRequired(Homegear sender, Device device, Channel channel, DeviceReloadType reloadType)
@@ -111,19 +131,19 @@ namespace HomegearXMLRPCService.Services
             {
                 //WriteLog("Received reload required event. Reloading.");
                 //Finish all operations on the Homegear object and then call:
-                homegear.Reload();
+                _homegear.Reload();
             }
             else if (reloadType == ReloadType.SystemVariables)
             {
                 //WriteLog("Reloading system variables.");
                 //Finish all operations on the system variables and then call:
-                homegear.SystemVariables.Reload();
+                _homegear.SystemVariables.Reload();
             }
             else if (reloadType == ReloadType.Events)
             {
                 //WriteLog("Reloading timed events.");
                 //Finish all operations on the timed events and then call:
-                homegear.TimedEvents.Reload();
+                _homegear.TimedEvents.Reload();
             }
         }
 

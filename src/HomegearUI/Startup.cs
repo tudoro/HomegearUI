@@ -6,6 +6,8 @@ using Abstractions.Services;
 using HomegearXMLRPCService.Services;
 using Microsoft.Extensions.Configuration;
 using HomegearXMLRPCService.Extensions;
+using DB.Contexts;
+using DB.Services;
 
 namespace HomegearUI
 {
@@ -51,6 +53,8 @@ namespace HomegearUI
             services.AddSingleton<IHomegearConnectionService, XMLRPCHomegearConnectionService>();
             services.AddSingleton<IDevicesService, XMLRPCDevicesService>();
             services.AddSingleton<ILightSwitchesService, XMLRPCLightSwitchesService>();
+            services.AddDbContext<HomegearDevicesContext>();
+            services.AddSingleton<ILightSwitchesPersistenceService, DBLightSwitchesPersistenceService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

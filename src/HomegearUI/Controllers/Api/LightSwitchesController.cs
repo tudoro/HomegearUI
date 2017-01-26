@@ -15,11 +15,11 @@ namespace HomegearUI.Controllers.Api
         /// <summary>
         /// Reference to the service communicating to the Homegear server
         /// </summary>
-        private readonly ILightSwitchesService lightSwitchesService;
+        private readonly ILightSwitchesService _lightSwitchesService;
 
         public LightSwitchesController(ILightSwitchesService lightSwitchService)
         {
-            this.lightSwitchesService = lightSwitchService;
+            this._lightSwitchesService = lightSwitchService;
         }
         
         /// <summary>
@@ -29,7 +29,7 @@ namespace HomegearUI.Controllers.Api
         [HttpGet]
         public IEnumerable<LightSwitchModel> GetAll()
         {
-            return lightSwitchesService.GetAll();
+            return _lightSwitchesService.GetAll();
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace HomegearUI.Controllers.Api
         {
             try
             {
-                var lightSwitchItem = lightSwitchesService.GetById(id);
+                var lightSwitchItem = _lightSwitchesService.GetById(id);
                 return new ObjectResult(lightSwitchItem);
             }
             catch (KeyNotFoundException e)
@@ -62,7 +62,7 @@ namespace HomegearUI.Controllers.Api
         {
             try
             {
-                lightSwitchesService.SetStateForId(id, lightSwitch.State);
+                _lightSwitchesService.SetStateForId(id, lightSwitch.State);
                 return NoContent();
             }
             catch (KeyNotFoundException e)
