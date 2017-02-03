@@ -1,21 +1,36 @@
 ﻿using System.Collections.Generic;
 using HomegearXMLRPCService.CallbackHandlers.Loggers;
+using Abstractions.Models;
 
 namespace HomegearXMLRPCService.CallbackHandlers
 {
     public class EventLoggerFactory
     {
-        private readonly Dictionary<string, IEventLogger> _eventLoggers = new Dictionary<string, IEventLogger>();
-
-        public void RegisterEventLogger(string eventName, IEventLogger eventLogger)
+        
+        private struct EventType
         {
-            _eventLoggers.Add(eventName, eventLogger);
+            public HomegearDeviceTypes DeviceType;
+            public string VariableName;
         }
 
-        public IEventLogger GetEventLoggerFor(string eventName)
+        private readonly Dictionary<EventType, IEventLogger> _eventLoggers = new Dictionary<EventType, IEventLogger>();
+
+        public void RegisterEventLogger(HomegearDeviceTypes deviceType, string variableName, IEventLogger eventLogger)
         {
+            EventType eventType;
+            eventType.DeviceType = deviceType;
+            eventType.VariableName = variableName;
+            _eventLoggers.Add(eventType, eventLogger);
+        }
+
+        public IEventLogger GetEventLoggerFor(HomegearDeviceTypes deviceType, string variableName)
+        {
+            EventType eventType;
+            eventType.DeviceType = deviceType;
+            eventType.VariableName = variableName;
             IEventLogger eventLogger; 
-            if (_eventLoggers.TryGetValue(eventName, out eventLogger))
+
+            if (_eventLoggers.TryGetValue(eventType, out eventLogger))
             {
                 return eventLogger;
             }

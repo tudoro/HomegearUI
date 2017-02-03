@@ -7,6 +7,7 @@ using HomegearLib;
 using System.Security.Authentication;
 using HomegearXMLRPCService.CallbackHandlers;
 using HomegearXMLRPCService.CallbackHandlers.Loggers;
+using Microsoft.Extensions.Logging;
 
 namespace HomegearXMLRPCService.Services
 {
@@ -23,12 +24,20 @@ namespace HomegearXMLRPCService.Services
 
         private EventLoggerFactory _eventLoggerFactory;
         private XMLRPCCallbackHandler _xmlRPCCallbackHandler;
+        private readonly ILogger<XMLRPCHomegearConnectionService> _logger;
 
-        public XMLRPCHomegearConnectionService(Homegear homegear, RPCController rpcController, ILightSwitchesPersistenceService lightSwitchesPersistence)
+        public XMLRPCHomegearConnectionService(
+            Homegear homegear, 
+            RPCController rpcController, 
+            ILightSwitchesPersistenceService lightSwitchesPersistence, 
+            IDoorWindowSensorActivityService doorWindowSensorActivityPersistence,
+            ILogger<XMLRPCHomegearConnectionService> logger,
+            ILightSwitchesService lightSwitchesService)
         {
             _homegearController = rpcController;
             _homegear = homegear;
             _lightSwitchesPersistence = lightSwitchesPersistence;
+            _logger = logger;
 
             _homegearController.ServerConnected += rpc_serverConnected;
 
@@ -40,7 +49,10 @@ namespace HomegearXMLRPCService.Services
 
             _xmlRPCCallbackHandler = new XMLRPCCallbackHandler();
             _eventLoggerFactory = new EventLoggerFactory();
-            _eventLoggerFactory.RegisterEventLogger("STATE", new LightSwitchEventLogger(lightSwitchesPersistence));
+
+            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.LightSwitch, "STATE", new LightSwitchEventLogger(lightSwitchesPersistence));
+            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.DoorWindowMagneticSensor, "STATE", new DoorWindowSensorStateEventLogger(doorWindowSensorActivityPersistence, lightSwitchesService));
+            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.DoorWindowMagneticSensor, "LOWBAT", new DoorWindowSensorLowBatteryEventLogger(doorWindowSensorActivityPersistence));
 
         }
 
@@ -67,7 +79,8 @@ namespace HomegearXMLRPCService.Services
         {
             try
             {
-                var eventLogger = _eventLoggerFactory.GetEventLoggerFor(variable.Name);
+                _logger.LogDebug("Variable {0} for device id {1} was updated to value {2}", variable.Name, device.TypeID, variable.BooleanValue);
+                var eventLogger = _eventLoggerFactory.GetEventLoggerFor((HomegearDeviceTypes)device.TypeID, "STATE");
                 _xmlRPCCallbackHandler.EventLogger = eventLogger;
                 _xmlRPCCallbackHandler.LogEvent(device, variable);
             }

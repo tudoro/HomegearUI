@@ -8,6 +8,9 @@ using Microsoft.Extensions.Configuration;
 using HomegearXMLRPCService.Extensions;
 using DB.Contexts;
 using DB.Services;
+using NLog.Extensions.Logging;
+using NLog.Web;
+using Microsoft.AspNetCore.Http;
 
 namespace HomegearUI
 {
@@ -51,16 +54,19 @@ namespace HomegearUI
 
             services.AddXMLRPCHomegear(configuration.GetSection("Homegear:Connection"));
             services.AddSingleton<IHomegearConnectionService, XMLRPCHomegearConnectionService>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IDevicesService, XMLRPCDevicesService>();
             services.AddSingleton<ILightSwitchesService, XMLRPCLightSwitchesService>();
             services.AddDbContext<HomegearDevicesContext>();
             services.AddSingleton<ILightSwitchesPersistenceService, DBLightSwitchesPersistenceService>();
+            services.AddSingleton<IDoorWindowSensorActivityService, DBDoorWindowSensorActivityService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IHomegearConnectionService homegear)
         {
             loggerFactory.AddConsole();
+            loggerFactory.AddNLog();
 
             this.logger.LogDebug("Confguration of the request pipeline.");
 
@@ -70,6 +76,8 @@ namespace HomegearUI
                 this.logger.LogDebug("Adding the developer exception.");
                 app.UseDeveloperExceptionPage();
             }
+
+            app.AddNLogWeb();
             app.UseStaticFiles();
             app.UseStatusCodePages();
 
@@ -82,7 +90,7 @@ namespace HomegearUI
 
             app.UseMvcWithDefaultRoute();
 
-            
+            env.ConfigureNLog("nlog.config");
         }
     }
 }

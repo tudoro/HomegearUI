@@ -8,7 +8,8 @@ namespace Abstractions.Models
     /// </summary>
     public enum HomegearDeviceTypes
     {
-        LightSwitch = 105
+        LightSwitch = 105,
+        DoorWindowMagneticSensor = 177
     }
 
     /// <summary>
