@@ -47,7 +47,7 @@ namespace HomegearXMLRPCService.Services
             _homegear.DeviceReloadRequired += homegear_OnDeviceReloadRequired;
             _homegear.DeviceVariableUpdated += homegear_OnDeviceVariableUpdated;
 
-            _xmlRPCCallbackHandler = new XMLRPCCallbackHandler();
+            _xmlRPCCallbackHandler = new XMLRPCCallbackHandler(_logger);
             _eventLoggerFactory = new EventLoggerFactory();
 
             _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.LightSwitch, "STATE", new LightSwitchEventLogger(lightSwitchesPersistence));
@@ -57,9 +57,9 @@ namespace HomegearXMLRPCService.Services
         }
 
         /// <summary>
-        /// 
+        /// The current status of the connection to Homegear
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The <see cref="Abstractions.Models.HomegearStatusModel"/> that contains the current status of the connection</returns>
         public HomegearStatusModel GetStatus()
         {
             return new HomegearStatusModel
@@ -71,16 +71,15 @@ namespace HomegearXMLRPCService.Services
         void rpc_serverConnected(RPCServer sender, CipherAlgorithmType cipherAlgorithm, Int32 cipherStrength)
         {
             ReadOnlyDictionary<int, UpdateResult> update = _homegear.GetUpdateStatus().Results;
-            if (cipherAlgorithm != CipherAlgorithmType.Null) Console.Write("Incoming connection from Homegear. Cipher Algorithm: " + cipherAlgorithm.ToString() + ", Cipher Strength: " + cipherStrength.ToString());
-            else Console.Write("Incoming connection from Homegear.");
+            _logger.LogInformation("Incomming connection from Homegear. Cipher algorithm: {0}, cipher strength: {1}.", cipherAlgorithm.ToString(), cipherStrength.ToString());
         }
 
         void homegear_OnDeviceVariableUpdated(Homegear sender, Device device, Channel channel, Variable variable)
         {
             try
             {
-                _logger.LogDebug("Variable {0} for device id {1} was updated to value {2}", variable.Name, device.TypeID, variable.BooleanValue);
-                var eventLogger = _eventLoggerFactory.GetEventLoggerFor((HomegearDeviceTypes)device.TypeID, "STATE");
+                _logger.LogDebug("Update event received for variable {0} for device id {1} with value {2}.", variable.Name, device.TypeID, variable.BooleanValue);
+                var eventLogger = _eventLoggerFactory.GetEventLoggerFor((HomegearDeviceTypes)device.TypeID, variable.Name);
                 _xmlRPCCallbackHandler.EventLogger = eventLogger;
                 _xmlRPCCallbackHandler.LogEvent(device, variable);
             }

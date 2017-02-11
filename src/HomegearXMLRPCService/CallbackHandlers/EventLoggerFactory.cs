@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using HomegearXMLRPCService.CallbackHandlers.Loggers;
 using Abstractions.Models;
+using Microsoft.Extensions.Logging;
 
 namespace HomegearXMLRPCService.CallbackHandlers
 {

@@ -1,0 +1,22 @@
+﻿{
+    "version": "1.0.0-*",
+
+    "dependencies": {
+        "MSTest.TestFramework": "1.0.8-rc2"
+    },
+
+    "testRunner": "mstest",
+
+    "frameworks": {
+        "net461": {
+            "dependencies": {
+                "HomegearXMLRPCService": {
+                    "target": "project"
+                },
+                "Abstractions": {
+                    "target": "project"
+                }
+            }
+    }
+  }
+}
