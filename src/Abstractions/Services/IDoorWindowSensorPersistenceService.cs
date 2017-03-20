@@ -2,7 +2,7 @@
 
 namespace Abstractions.Services
 {
-    public interface IDoorWindowSensorActivityService
+    public interface IDoorWindowSensorPersistenceService
     {
         void LogOpenCloseStateOnSenor(DoorWindowSensorModel doorWindowSensor);
         void LogLowBatteryStateOnSensor(DoorWindowSensorModel doorWindowSensor);

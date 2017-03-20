@@ -6,7 +6,7 @@ using System;
 
 namespace DB.Services
 {
-    public class DBDoorWindowSensorActivityService : IDoorWindowSensorActivityService
+    public class DBDoorWindowSensorActivityService : IDoorWindowSensorPersistenceService
     {
         private readonly HomegearDevicesContext _dbContext;
 

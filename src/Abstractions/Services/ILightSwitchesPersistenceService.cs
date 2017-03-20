@@ -4,6 +4,6 @@ namespace Abstractions.Services
 {
     public interface ILightSwitchesPersistenceService
     {
-        void LogActionOnLightswitch(LightSwitchModel lightSwitch);
+        void LogUpdateOnLightswitch(LightSwitchModel lightSwitch);
     }
 }

@@ -2,15 +2,17 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Abstractions.Services;
-using HomegearXMLRPCService.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using NLog.Extensions.Logging;
+using NLog.Web;
+using HomegearXMLRPCService.Services;
 using HomegearXMLRPCService.Extensions;
 using DB.Contexts;
 using DB.Services;
-using NLog.Extensions.Logging;
-using NLog.Web;
-using Microsoft.AspNetCore.Http;
+using Abstractions.Models;
+using Abstractions.Models.Options;
+using Abstractions.Services;
 
 namespace HomegearUI
 {
@@ -52,14 +54,20 @@ namespace HomegearUI
             // here we could add specific policies that can be selected at run time.
             services.AddCors();
 
+            services.Configure<LightSwitchOptions>(configuration.GetSection("Homegear:Devices:LightSwitch"));
+
             services.AddXMLRPCHomegear(configuration.GetSection("Homegear:Connection"));
             services.AddSingleton<IHomegearConnectionService, XMLRPCHomegearConnectionService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IDevicesService, XMLRPCDevicesService>();
-            services.AddSingleton<ILightSwitchesService, XMLRPCLightSwitchesService>();
+
+            services.AddSingleton<IDevicesService<HomegearDeviceModel>, XMLRPCDevicesService>();
+            services.AddSingleton<IDevicesService<LightSwitchModel>, XMLRPCLightSwitchesService>();
+            services.AddSingleton<IDevicesService<DimmerModel>, XMLRPCDimmersService>();
+
             services.AddDbContext<HomegearDevicesContext>();
             services.AddSingleton<ILightSwitchesPersistenceService, DBLightSwitchesPersistenceService>();
-            services.AddSingleton<IDoorWindowSensorActivityService, DBDoorWindowSensorActivityService>();
+            services.AddSingleton<IExternalWallSocketsPersistenceService, DBExternalWallSocketsPersistenceService>();
+            services.AddSingleton<IDoorWindowSensorPersistenceService, DBDoorWindowSensorActivityService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -9,7 +9,7 @@ namespace HomegearXMLRPCService.Services
     /// <summary>
     /// Used to manage the general information about the devices registered in the Homegear system.
     /// </summary>
-    public class XMLRPCDevicesService : IDevicesService
+    public class XMLRPCDevicesService : IDevicesService<HomegearDeviceModel>
     {
         /// <summary>
         /// Reference to the <see cref="Homegear"/> service that is used to provide
@@ -43,18 +43,22 @@ namespace HomegearXMLRPCService.Services
             return homegearDevices;
         }
 
+        public HomegearDeviceModel GetById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Updates information about a device
         /// </summary>
         /// <param name="deviceModel">The device information to update</param>
         /// <returns>The updated device</returns>
-        public HomegearDeviceModel UpdateDevice(HomegearDeviceModel deviceModel)
+        public void UpdateDevice(HomegearDeviceModel deviceModel)
         {
             Device foundDevice;
             if (_homegear.Devices.TryGetValue(deviceModel.Id, out foundDevice))
             {
                 foundDevice.Name = deviceModel.Name;
-                return deviceModel;
             }
             else
             {

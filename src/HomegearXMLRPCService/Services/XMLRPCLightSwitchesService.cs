@@ -2,20 +2,19 @@
 using Abstractions.Services;
 using Abstractions.Models;
 using HomegearLib;
+using System;
 
 namespace HomegearXMLRPCService.Services
 {
     /// <summary>
     /// Manages the lightswitches
     /// </summary>
-    public class XMLRPCLightSwitchesService : ILightSwitchesService
+    public class XMLRPCLightSwitchesService : IDevicesService<LightSwitchModel>
     {
-        /// <summary>
-        /// Reference to the <see cref="Homegear"/> service
-        /// </summary>
         private readonly Homegear _homegear;
+        private readonly ILightSwitchesPersistenceService _lightSiwtchPersistence;
 
-        public XMLRPCLightSwitchesService(Homegear homegear)
+        public XMLRPCLightSwitchesService(Homegear homegear, ILightSwitchesPersistenceService lightSiwtchPersistence)
         {
             this._homegear = homegear;
         }
@@ -68,20 +67,22 @@ namespace HomegearXMLRPCService.Services
         }
 
         /// <summary>
-        /// Turns a lightswitch on or off
+        /// Turns a lightswitch on or off and logs the state change in the 
+        /// persistence via the <see cref="ILightSwitchesPersistenceService"/>.
         /// </summary>
         /// <param name="id">The id of the device</param>
         /// <param name="state">True for turning on, False otherwise</param>
-        public void SetStateForId(int id, bool state)
+        public void UpdateDevice(LightSwitchModel lightSwitch)
         {
             try
             {
-                Device device = GetDeviceForId(id);
+                Device device = GetDeviceForId(lightSwitch.Id);
                 if (device.TypeID != (int)HomegearDeviceTypes.LightSwitch)
                 {
                     throw new KeyNotFoundException();
                 }
-                device.Channels[1].Variables["STATE"].BooleanValue = state;
+                device.Channels[1].Variables["STATE"].BooleanValue = lightSwitch.State;
+                _lightSiwtchPersistence.LogUpdateOnLightswitch(lightSwitch);  
             }
             catch (KeyNotFoundException e)
             {

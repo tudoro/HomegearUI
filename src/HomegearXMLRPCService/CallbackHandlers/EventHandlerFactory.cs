@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using HomegearXMLRPCService.CallbackHandlers.Loggers;
 using Abstractions.Models;
+using Abstractions.Services;
 using Microsoft.Extensions.Logging;
 
 namespace HomegearXMLRPCService.CallbackHandlers
 {
-    public class EventLoggerFactory
+    public class EventHandlerFactory
     {
         
         private struct EventType
@@ -14,9 +14,9 @@ namespace HomegearXMLRPCService.CallbackHandlers
             public string VariableName;
         }
 
-        private readonly Dictionary<EventType, IEventLogger> _eventLoggers = new Dictionary<EventType, IEventLogger>();
+        private readonly Dictionary<EventType, IEventHandler> _eventLoggers = new Dictionary<EventType, IEventHandler>();
 
-        public void RegisterEventLogger(HomegearDeviceTypes deviceType, string variableName, IEventLogger eventLogger)
+        public void RegisterEventLogger(HomegearDeviceTypes deviceType, string variableName, IEventHandler eventLogger)
         {
             EventType eventType;
             eventType.DeviceType = deviceType;
@@ -24,12 +24,12 @@ namespace HomegearXMLRPCService.CallbackHandlers
             _eventLoggers.Add(eventType, eventLogger);
         }
 
-        public IEventLogger GetEventLoggerFor(HomegearDeviceTypes deviceType, string variableName)
+        public IEventHandler GetEventLoggerFor(HomegearDeviceTypes deviceType, string variableName)
         {
             EventType eventType;
             eventType.DeviceType = deviceType;
             eventType.VariableName = variableName;
-            IEventLogger eventLogger; 
+            IEventHandler eventLogger; 
 
             if (_eventLoggers.TryGetValue(eventType, out eventLogger))
             {

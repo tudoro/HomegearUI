@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Abstractions.Services;
 using Abstractions.Models;
@@ -15,9 +14,9 @@ namespace HomegearUI.Controllers.Api
         /// <summary>
         /// Reference to the service communicating to the Homegear server
         /// </summary>
-        private readonly ILightSwitchesService _lightSwitchesService;
+        private readonly IDevicesService<LightSwitchModel> _lightSwitchesService;
 
-        public LightSwitchesController(ILightSwitchesService lightSwitchService)
+        public LightSwitchesController(IDevicesService<LightSwitchModel> lightSwitchService)
         {
             this._lightSwitchesService = lightSwitchService;
         }
@@ -62,7 +61,8 @@ namespace HomegearUI.Controllers.Api
         {
             try
             {
-                _lightSwitchesService.SetStateForId(id, lightSwitch.State);
+                lightSwitch.Id = id;
+                _lightSwitchesService.UpdateDevice(lightSwitch);
                 return NoContent();
             }
             catch (KeyNotFoundException e)

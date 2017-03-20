@@ -1,5 +1,10 @@
 ﻿namespace Abstractions.Models
 {
+    public static class LightSwitchVariables
+    {
+        public static readonly string STATE = "STATE";
+    }
+
     /// <summary>
     /// Represents the Light Switch device with type <see cref="HomegearDeviceTypes.LightSwitch"/>
     /// </summary>

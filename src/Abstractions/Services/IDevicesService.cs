@@ -1,24 +1,30 @@
-﻿using Abstractions.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Abstractions.Models;
 
 namespace Abstractions.Services
 {
     /// <summary>
-    /// Manages all <see cref="HomegearDeviceModel"/> in the system
+    /// Manages the devices
     /// </summary>
-    public interface IDevicesService
-    {
+    public interface IDevicesService<DeviceModel>
+    {        
         /// <summary>
-        /// Fetches all the devices registered with the Homegear system
+        /// Fetches all the lightswitches registered in the Homegear system
         /// </summary>
-        /// <returns>The devices in the system</returns>
-        IEnumerable<HomegearDeviceModel> GetAll();
+        /// <returns>All the lightswitches</returns>
+        IEnumerable<DeviceModel> GetAll();
 
         /// <summary>
-        /// Updates a device
+        /// Returns the light switch which matches the peerId
         /// </summary>
-        /// <param name="device">The device to update</param>
-        /// <returns>The updated device</returns>
-        HomegearDeviceModel UpdateDevice(HomegearDeviceModel device);
+        /// <param name="id">The Id of the light switch</param>
+        /// <returns>The light switch for the given peerId</returns>
+        DeviceModel GetById(int id);
+
+        /// <summary>
+        /// Updates the parameters of a device
+        /// </summary>
+        /// <param name="deviceModel">The device model</param>
+        void UpdateDevice(DeviceModel deviceModel);
     }
 }

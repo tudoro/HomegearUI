@@ -16,9 +16,9 @@ namespace HomegearUI.Controllers.Api
         /// <summary>
         /// Reference to the service that communicates with Homegear
         /// </summary>
-        private IDevicesService _devicesService;
+        private IDevicesService<HomegearDeviceModel> _devicesService;
 
-        public DevicesController(IDevicesService devicesService)
+        public DevicesController(IDevicesService<HomegearDeviceModel> devicesService)
         {
             this._devicesService = devicesService;
         }
@@ -49,7 +49,8 @@ namespace HomegearUI.Controllers.Api
                 try
                 {
                     homegearDevice.Id = id;
-                    return Ok(_devicesService.UpdateDevice(homegearDevice));
+                    _devicesService.UpdateDevice(homegearDevice);
+                    return NoContent();
                 }
                 catch (KeyNotFoundException e)
                 {

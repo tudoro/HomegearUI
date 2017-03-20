@@ -6,7 +6,6 @@ using HomegearLib.RPC;
 using HomegearLib;
 using System.Security.Authentication;
 using HomegearXMLRPCService.CallbackHandlers;
-using HomegearXMLRPCService.CallbackHandlers.Loggers;
 using Microsoft.Extensions.Logging;
 
 namespace HomegearXMLRPCService.Services
@@ -20,23 +19,21 @@ namespace HomegearXMLRPCService.Services
     {
         private Homegear _homegear;
         private RPCController _homegearController;
-        private ILightSwitchesPersistenceService _lightSwitchesPersistence;
 
-        private EventLoggerFactory _eventLoggerFactory;
-        private XMLRPCCallbackHandler _xmlRPCCallbackHandler;
+        private EventHandlerFactory _eventLoggerFactory;
         private readonly ILogger<XMLRPCHomegearConnectionService> _logger;
 
         public XMLRPCHomegearConnectionService(
             Homegear homegear, 
             RPCController rpcController, 
             ILightSwitchesPersistenceService lightSwitchesPersistence, 
-            IDoorWindowSensorActivityService doorWindowSensorActivityPersistence,
+            IDoorWindowSensorPersistenceService doorWindowSensorActivityPersistence,
+            IExternalWallSocketsPersistenceService externalWallSocketPersistenceService,
             ILogger<XMLRPCHomegearConnectionService> logger,
-            ILightSwitchesService lightSwitchesService)
+            IDevicesService<LightSwitchModel> lightSwitchesService)
         {
             _homegearController = rpcController;
             _homegear = homegear;
-            _lightSwitchesPersistence = lightSwitchesPersistence;
             _logger = logger;
 
             _homegearController.ServerConnected += rpc_serverConnected;
@@ -47,12 +44,15 @@ namespace HomegearXMLRPCService.Services
             _homegear.DeviceReloadRequired += homegear_OnDeviceReloadRequired;
             _homegear.DeviceVariableUpdated += homegear_OnDeviceVariableUpdated;
 
-            _xmlRPCCallbackHandler = new XMLRPCCallbackHandler(_logger);
-            _eventLoggerFactory = new EventLoggerFactory();
+            _eventLoggerFactory = new EventHandlerFactory();
 
-            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.LightSwitch, "STATE", new LightSwitchEventLogger(lightSwitchesPersistence));
-            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.DoorWindowMagneticSensor, "STATE", new DoorWindowSensorStateEventLogger(doorWindowSensorActivityPersistence, lightSwitchesService));
-            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.DoorWindowMagneticSensor, "LOWBAT", new DoorWindowSensorLowBatteryEventLogger(doorWindowSensorActivityPersistence));
+            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.LightSwitch, LightSwitchVariables.STATE, new LightSwitchEventHandler(lightSwitchesPersistence));
+            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.DoorWindowMagneticSensor, DoorWindowSensorVariables.STATE, new DoorWindowSensorStateEventHandler(doorWindowSensorActivityPersistence, lightSwitchesService));
+            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.DoorWindowMagneticSensor, DoorWindowSensorVariables.LOWBAT, new DoorWindowSensorLowBatteryEventHandler(doorWindowSensorActivityPersistence));
+            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.ExternalWallSocket, ExternalWallSocketVariables.CURRENT, new ExternalWallSocketHandler(externalWallSocketPersistenceService));
+            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.ExternalWallSocket, ExternalWallSocketVariables.VOLTAGE, new ExternalWallSocketHandler(externalWallSocketPersistenceService));
+            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.ExternalWallSocket, ExternalWallSocketVariables.FREQUENCY, new ExternalWallSocketHandler(externalWallSocketPersistenceService));
+            _eventLoggerFactory.RegisterEventLogger(HomegearDeviceTypes.ExternalWallSocket, ExternalWallSocketVariables.ENERGY_COUNTER, new ExternalWallSocketHandler(externalWallSocketPersistenceService));
 
         }
 
@@ -79,12 +79,27 @@ namespace HomegearXMLRPCService.Services
             try
             {
                 _logger.LogDebug("Update event received for variable {0} for device id {1} with value {2}.", variable.Name, device.TypeID, variable.BooleanValue);
-                var eventLogger = _eventLoggerFactory.GetEventLoggerFor((HomegearDeviceTypes)device.TypeID, variable.Name);
-                _xmlRPCCallbackHandler.EventLogger = eventLogger;
-                _xmlRPCCallbackHandler.LogEvent(device, variable);
+
+                dynamic variableValue = "";
+                if (variable.StringValue != null && variable.StringValue != "")
+                {
+                    variableValue = variable.StringValue;
+                }
+                else if (variable.DoubleValue != 0)
+                {
+                    variableValue = variable.DoubleValue;
+                }
+                else if (variable.IntegerValue != 0)
+                {
+                    variableValue = variable.IntegerValue;
+                }
+
+                _eventLoggerFactory.GetEventLoggerFor((HomegearDeviceTypes)device.TypeID, variable.Name).LogEvent(device.ID, variable.Name, variableValue);
             }
             catch (KeyNotFoundException exception)
-            {}
+            {
+                _logger.LogDebug("No handler found for variable {0} with id {1}. Exception message: {1}", variable.Name, device.TypeID, exception.Message);
+            }
         }
 
         void homegear_OnDeviceReloadRequired(Homegear sender, Device device, Channel channel, DeviceReloadType reloadType)

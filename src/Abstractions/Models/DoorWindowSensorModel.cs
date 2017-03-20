@@ -5,12 +5,22 @@ using System.Threading.Tasks;
 
 namespace Abstractions.Models
 {
+    public static class DoorWindowSensorVariables
+    {
+        public static readonly string STATE = "STATE";
+        public static readonly string LOWBAT = "LOWBAT";
+    }
+
+    /// <summary>
+    /// Represents the Door/window open/close detector model class.
+    /// </summary>
     public class DoorWindowSensorModel
     {
         /// <summary>
         /// Unique identifier of this device.
         /// </summary>
         public int Id { get; set; }
+
         /// <summary>
         /// Current state of the device.
         /// True if door/window is open, False otherwise.
